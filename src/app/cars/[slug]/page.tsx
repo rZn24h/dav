@@ -4,8 +4,7 @@ import { notFound } from 'next/navigation';
 import CarClient from './CarClient';
 
 export async function generateMetadata(props: { params: { slug: string } }) {
-  const params = await props.params;
-  const slug = params.slug;
+  const { slug } = props.params;
   const docRef = doc(db, 'cars', slug);
   const docSnap = await getDoc(docRef);
   if (!docSnap.exists()) {
@@ -16,8 +15,7 @@ export async function generateMetadata(props: { params: { slug: string } }) {
 }
 
 export default async function Page(props: { params: { slug: string } }) {
-  const params = await props.params;
-  const slug = params.slug;
+  const { slug } = props.params;
   const docRef = doc(db, 'cars', slug);
   const docSnap = await getDoc(docRef);
   if (!docSnap.exists()) {
