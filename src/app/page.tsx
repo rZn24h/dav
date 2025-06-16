@@ -186,7 +186,7 @@ export default function HomePage() {
           ) : (
             <>
               <h1 className="display-4 fw-bold mb-4">{config?.nume || 'Anunțuri Auto'}</h1>
-              <p className="lead mb-0">{config?.descriere || 'Descoperă mașina perfectă pentru tine'}</p>
+              <p className="lead mb-0">{config?.descriere || 'Descoperă mașina perfectă pentru tine!'}</p>
 
               {/* Search Section */}
               <div className="search-container mt-4">
