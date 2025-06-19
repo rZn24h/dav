@@ -44,13 +44,12 @@ export default function CarCard({ car }: CarCardProps) {
 
       {/* Car Details */}
       <div className="card-body">
-        {/* Title and Price */}
-        <div className="d-flex justify-content-between align-items-start mb-3">
-          <div>
+        <div className="car-details-header">
+          <div className="car-title-wrapper">
             <h3 className="car-title">
               {car.marca} {car.model}
             </h3>
-            <div className="d-flex align-items-center gap-2 text-muted mb-2">
+            <div className="car-year">
               <FaCalendarAlt size={14} />
               <span>{car.an}</span>
             </div>

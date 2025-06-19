@@ -184,11 +184,16 @@ export default function CarClient({ car }: { car: CarDetails }) {
                 ✨ Dotări
               </h2>
               <div className="car-details-features">
-                {car.dotari.split('\n').map((feature, idx) => (
-                  <div key={idx} className="car-feature-item">
-                    <span>•</span> {feature}
-                  </div>
-                ))}
+                {car.dotari
+                  .split(/[,\n]/) // Split by comma or newline
+                  .map(feature => feature.trim()) // Remove whitespace
+                  .filter(feature => feature.length > 0) // Remove empty items
+                  .map((feature, idx) => (
+                    <div key={idx} className="car-feature-item">
+                      <span className="feature-bullet">•</span> 
+                      <span className="feature-text">{feature}</span>
+                    </div>
+                  ))}
               </div>
             </div>
           )}
