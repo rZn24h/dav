@@ -55,6 +55,27 @@ const Footer = () => {
             )}
           </div>
         </div>
+        
+        {/* Developer Signature */}
+        <div className="row mt-3">
+          <div className="col-12 text-center">
+            <hr className="my-2" />
+            <p className="mb-0 text-muted small">
+              Powered by{' '}
+              <span 
+                className="fw-bold"
+                style={{ 
+                  background: 'linear-gradient(45deg, #002f34, #23e5db)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}
+              >
+                rZn
+              </span>
+            </p>
+          </div>
+        </div>
       </div>
     </footer>
   );

@@ -136,7 +136,7 @@ export default function HomePage() {
       <section 
         className="hero-section position-relative d-flex align-items-center justify-content-center text-white"
         style={{
-          minHeight: '50vh',
+          minHeight: '40vh',
           backgroundColor: '#f8f9fa',
           marginTop: '-56px'
         }}
@@ -158,7 +158,7 @@ export default function HomePage() {
           <div 
             className="position-absolute w-100 h-100"
             style={{
-              backgroundColor: 'var(--color-primary)',
+              backgroundColor: '#002f34',
               top: 0,
               left: 0,
               zIndex: 0
@@ -170,7 +170,7 @@ export default function HomePage() {
         <div 
           className="position-absolute w-100 h-100" 
           style={{ 
-            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
             top: 0,
             left: 0,
             zIndex: 1
@@ -186,113 +186,125 @@ export default function HomePage() {
           ) : (
             <>
               <h1 className="display-4 fw-bold mb-4">{config?.nume || 'Anunțuri Auto'}</h1>
-              <p className="lead mb-0">{config?.descriere || 'Descoperă mașina perfectă pentru tine!'}</p>
-
-              {/* Search Section */}
-              <div className="search-container mt-4">
-                <div className="row g-3">
-                  {/* Brand Search */}
-                  <div className="col-12 col-md-6 col-lg-3">
-                    <div className="position-relative search-bar-item">
-                      <label className="form-label text-white">Marcă</label>
-                      <input
-                        type="text"
-                        className="form-control form-control-lg"
-                        placeholder="Caută marcă..."
-                        value={searchMarca}
-                        onChange={handleBrandInputChange}
-                        onFocus={() => {
-                          setShowSuggestions(true);
-                          if (!searchMarca.trim()) {
-                            setFilteredMarci(allMarci);
-                          }
-                        }}
-                      />
-                      {showSuggestions && (
-                        <div className="brand-suggestions position-absolute w-100 bg-white shadow-sm rounded mt-1">
-                          <ul className="list-unstyled m-0 p-0">
-                            {filteredMarci.map((marca, index) => (
-                              <li
-                                key={index}
-                                onClick={() => handleBrandSelect(marca)}
-                                className="suggestion-item px-3 py-2 cursor-pointer"
-                              >
-                                {marca}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Price Range */}
-                  <div className="col-12 col-sm-6 col-lg-3">
-                    <label className="form-label text-white">Preț minim</label>
-                    <input
-                      type="number"
-                      className="form-control form-control-lg"
-                      placeholder="Preț minim"
-                      value={pretMin}
-                      onChange={(e) => setPretMin(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="col-12 col-sm-6 col-lg-3">
-                    <label className="form-label text-white">Preț maxim</label>
-                    <input
-                      type="number"
-                      className="form-control form-control-lg"
-                      placeholder="Preț maxim"
-                      value={pretMax}
-                      onChange={(e) => setPretMax(e.target.value)}
-                    />
-                  </div>
-
-                  {/* Reset Button */}
-                  <div className="col-12 col-lg-3">
-                    <label className="form-label text-white">&nbsp;</label>
-                    <button
-                      className="btn btn-light btn-lg w-100"
-                      onClick={handleReset}
-                    >
-                      Resetează filtrele
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <p className="lead mb-0">{config?.slogan || 'Descoperă mașina perfectă pentru tine!'}</p>
             </>
           )}
         </div>
       </section>
 
-      {/* Main Content */}
-      <div className="main-container py-5">
-        {/* Listings Container */}
-        <div className="listings-container">
-          <div className="listings-header mb-4">
-            <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-              <h2 className="h3 mb-0">Anunțuri disponibile</h2>
-              <div className="sort-controls d-flex gap-2 flex-wrap">
-                <button
-                  className={`btn ${sortBy === 'price-asc' ? 'btn-primary' : 'btn-outline-primary'}`}
-                  onClick={() => handleSort('price-asc')}
-                >
-                  <i className="bi bi-sort-numeric-down me-1"></i>
-                  Preț crescător
-                </button>
-                <button
-                  className={`btn ${sortBy === 'price-desc' ? 'btn-primary' : 'btn-outline-primary'}`}
-                  onClick={() => handleSort('price-desc')}
-                >
-                  <i className="bi bi-sort-numeric-up-alt me-1"></i>
-                  Preț descrescător
-                </button>
+      {/* Search Section */}
+      <div className="container">
+        <div className="search-container">
+          <div className="row g-3">
+            {/* Brand Search */}
+            <div className="col-12 col-md-6 col-lg-3">
+              <div className="position-relative search-bar-item">
+                <label className="form-label">Marcă</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Caută marcă..."
+                  value={searchMarca}
+                  onChange={handleBrandInputChange}
+                  onFocus={() => {
+                    setShowSuggestions(true);
+                    if (!searchMarca.trim()) {
+                      setFilteredMarci(allMarci);
+                    }
+                  }}
+                />
+                {showSuggestions && (
+                  <div className="brand-suggestions">
+                    <ul>
+                      {filteredMarci.map((marca, index) => (
+                        <li
+                          key={index}
+                          onClick={() => handleBrandSelect(marca)}
+                          className="suggestion-item"
+                        >
+                          {marca}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
+
+            {/* Price Range */}
+            <div className="col-12 col-sm-6 col-lg-3">
+              <div className="search-bar-item">
+                <label className="form-label">Preț minim</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  placeholder="Preț minim"
+                  value={pretMin}
+                  onChange={(e) => setPretMin(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="col-12 col-sm-6 col-lg-3">
+              <div className="search-bar-item">
+                <label className="form-label">Preț maxim</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  placeholder="Preț maxim"
+                  value={pretMax}
+                  onChange={(e) => setPretMax(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Sort Controls */}
+            <div className="col-12 col-lg-3">
+              <div className="search-bar-item">
+                <label className="form-label">Sortare după preț</label>
+                <div className="d-flex gap-2">
+                  <button
+                    className={`btn flex-grow-1 ${
+                      sortBy === 'price-asc' ? 'btn-primary' : 'btn-outline-primary'
+                    }`}
+                    onClick={() => handleSort('price-asc')}
+                  >
+                    Crescător
+                  </button>
+                  <button
+                    className={`btn flex-grow-1 ${
+                      sortBy === 'price-desc' ? 'btn-primary' : 'btn-outline-primary'
+                    }`}
+                    onClick={() => handleSort('price-desc')}
+                  >
+                    Descrescător
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Reset Button */}
+            {(marca || pretMin || pretMax || sortBy) && (
+              <div className="col-12">
+                <button
+                  className="btn btn-outline-secondary w-100"
+                  onClick={handleReset}
+                >
+                  Resetează filtrele
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Listings Section */}
+        <div className="listings-container">
+          <div className="listings-header">
+            <h2>
+              {filtered.length} {filtered.length === 1 ? 'anunț' : 'anunțuri'} disponibile
+            </h2>
           </div>
 
-          {/* Cars Grid */}
           {loading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status">
@@ -300,16 +312,14 @@ export default function HomePage() {
               </div>
             </div>
           ) : filtered.length > 0 ? (
-            <div className="row g-4">
+            <div className="listings-grid">
               {filtered.map((car) => (
-                <div key={car.id} className="col-12 col-sm-6 col-md-6 col-lg-4">
-                  <CarCard car={car} />
-                </div>
+                <CarCard key={car.id} car={car} />
               ))}
             </div>
           ) : (
             <div className="text-center py-5">
-              <p className="text-muted mb-0">Nu am găsit anunțuri care să corespundă criteriilor tale.</p>
+              <h3 className="text-muted">Nu am găsit anunțuri care să corespundă criteriilor tale.</h3>
             </div>
           )}
         </div>

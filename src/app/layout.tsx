@@ -5,13 +5,18 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Script from 'next/script';
+import { getConfig } from "@/utils/apiCars";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: "AutoD",
-  description: "AutoD - Your Car Service Platform",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await getConfig();
+  
+  return {
+    title: config?.siteTitle || "AutoD",
+    description: config?.siteDescription || "AutoD - Your Car Service Platform",
+  };
+}
 
 export default function RootLayout({
   children,

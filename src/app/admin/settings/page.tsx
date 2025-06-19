@@ -16,6 +16,8 @@ interface ConfigData {
   locatie?: string;
   whatsapp?: string;
   facebook?: string;
+  siteTitle?: string;
+  siteDescription?: string;
 }
 
 export default function SettingsPage() {
@@ -28,6 +30,8 @@ export default function SettingsPage() {
     locatie: '',
     whatsapp: '',
     facebook: '',
+    siteTitle: '',
+    siteDescription: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -53,6 +57,8 @@ export default function SettingsPage() {
             locatie: data.locatie || '',
             whatsapp: data.whatsapp || '',
             facebook: data.facebook || '',
+            siteTitle: data.siteTitle || '',
+            siteDescription: data.siteDescription || '',
           });
         }
       } catch (err) {
@@ -247,6 +253,42 @@ export default function SettingsPage() {
                 onChange={handleChange}
                 placeholder="Ex: https://www.facebook.com/numepagina"
               />
+            </div>
+
+            {/* SEO Settings */}
+            <div className="col-12">
+              <hr className="my-4" />
+              <h3 className="h5 mb-3">Setări SEO</h3>
+            </div>
+            
+            <div className="col-md-6">
+              <label className="form-label">Titlu site (apare în tab browser)</label>
+              <input
+                type="text"
+                className="form-control"
+                name="siteTitle"
+                value={form.siteTitle}
+                onChange={handleChange}
+                placeholder="Ex: AutoD - Anunțuri Auto"
+              />
+              <div className="form-text">
+                Acest titlu va apărea în tab-ul browserului și în rezultatele căutărilor Google
+              </div>
+            </div>
+            
+            <div className="col-md-6">
+              <label className="form-label">Descriere site</label>
+              <input
+                type="text"
+                className="form-control"
+                name="siteDescription"
+                value={form.siteDescription}
+                onChange={handleChange}
+                placeholder="Ex: Cele mai bune oferte de mașini second hand din România"
+              />
+              <div className="form-text">
+                Această descriere va apărea în rezultatele căutărilor Google
+              </div>
             </div>
 
             <div className="col-12">

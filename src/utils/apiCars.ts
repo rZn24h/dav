@@ -2,6 +2,12 @@ import { db, storage } from './firebase';
 import { collection, addDoc, Timestamp, deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
+export async function getConfig() {
+  const configRef = doc(db, 'config', 'public');
+  const configDoc = await getDoc(configRef);
+  return configDoc.exists() ? configDoc.data() : null;
+}
+
 export async function addCar(data: any, images: File[], userId: string, coverImageIndex: number) {
   // 1. Upload images to Firebase Storage and get URLs
   const imageUrls: string[] = [];

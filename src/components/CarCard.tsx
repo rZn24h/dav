@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FaRoad, FaGasPump, FaCog, FaTachometerAlt, FaCar } from 'react-icons/fa';
+import { FaRoad, FaGasPump, FaCog, FaTachometerAlt, FaCar, FaCalendarAlt } from 'react-icons/fa';
 
 interface CarCardProps {
   car: {
@@ -30,10 +30,10 @@ export default function CarCard({ car }: CarCardProps) {
   return (
     <Link 
       href={`/cars/${car.id}`} 
-      className="text-decoration-none card h-100 border-0 shadow-sm hover-card"
+      className="hover-card"
     >
       {/* Car Image */}
-      <div className="position-relative">
+      <div className="car-image-wrapper">
         <img
           src={displayImage}
           alt={`${car.marca} ${car.model}`}
@@ -43,24 +43,25 @@ export default function CarCard({ car }: CarCardProps) {
       </div>
 
       {/* Car Details */}
-      <div className="card-body p-3">
-        {/* Title */}
-        <div className="d-flex justify-content-between align-items-start mb-2">
-          <h3 
-            className="car-title mb-0" 
-            style={{
-              fontSize: '1.1rem',
-              fontWeight: 600,
-              color: '#1a1a1a'
-            }}
-          >
-            {car.marca} {car.model}
-          </h3>
-          <span className="text-muted">{car.an}</span>
+      <div className="card-body">
+        {/* Title and Price */}
+        <div className="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h3 className="car-title">
+              {car.marca} {car.model}
+            </h3>
+            <div className="d-flex align-items-center gap-2 text-muted mb-2">
+              <FaCalendarAlt size={14} />
+              <span>{car.an}</span>
+            </div>
+          </div>
+          <div className="price-tag">
+            {formattedPrice} €
+          </div>
         </div>
 
         {/* Specs */}
-        <div className="specs-grid mb-3">
+        <div className="specs-grid">
           <div className="spec-item">
             <FaRoad className="spec-icon" />
             <span className="spec-text">{formattedKm} km</span>
@@ -82,13 +83,6 @@ export default function CarCard({ car }: CarCardProps) {
           <div className="spec-item">
             <FaCog className="spec-icon" />
             <span className="spec-text">{car.transmisie}</span>
-          </div>
-        </div>
-
-        {/* Price */}
-        <div className="mt-auto">
-          <div className="price-tag">
-            {formattedPrice} €
           </div>
         </div>
       </div>
