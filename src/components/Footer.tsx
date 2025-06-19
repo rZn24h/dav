@@ -71,7 +71,7 @@ const Footer = () => {
                   backgroundClip: 'text'
                 }}
               >
-                rZn
+                rZn24
               </span>
             </p>
           </div>
