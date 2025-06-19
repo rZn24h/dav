@@ -186,11 +186,11 @@ export default function CarClient({ car }: { car: CarDetails }) {
               <div className="car-details-features">
                 {car.dotari
                   .split(/[,\n]/) // Split by comma or newline
-                  .map(feature => feature.trim()) // Remove whitespace
+                  .map((feature, idx) => feature.trim()) // Trim whitespace
                   .filter(feature => feature.length > 0) // Remove empty items
                   .map((feature, idx) => (
                     <div key={idx} className="car-feature-item">
-                      <span className="feature-bullet">•</span> 
+                      <span className="feature-bullet">•</span>
                       <span className="feature-text">{feature}</span>
                     </div>
                   ))}
