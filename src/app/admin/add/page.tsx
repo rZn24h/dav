@@ -5,6 +5,7 @@ import { addCar } from '@/utils/apiCars';
 import { useAuth } from '@/contexts/AuthContext';
 import AdminAuthGuard from '@/components/AdminAuthGuard';
 import AdminNavbar from '@/components/AdminNavbar';
+import { validateAndCompressImage, validateImageFiles } from '@/utils/imageUtils';
 
 const REGISTER_SECRET = process.env.NEXT_PUBLIC_REGISTER_SECRET || 'adminSecret2025';
 
@@ -152,17 +153,52 @@ export default function AddCarPage() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
+      
+      // Verifică numărul de fișiere
       if (files.length > 8) {
         setErrors(prev => ({ ...prev, images: 'Poți selecta maxim 8 imagini' }));
         setImages([]);
         setCoverImageIndex(0);
         if (fileInputRef.current) fileInputRef.current.value = '';
+        return;
+      }
+
+      // Verifică tipul fișierelor
+      const validationResult = validateImageFiles(files);
+      if (!validationResult.isValid) {
+        setErrors(prev => ({ ...prev, images: validationResult.error }));
+        setImages([]);
+        setCoverImageIndex(0);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        return;
+      }
+
+      // Procesează fiecare imagine
+      const processedImages: File[] = [];
+      let hasError = false;
+
+      for (const file of files) {
+        const result = await validateAndCompressImage(file);
+        if (!result.isValid) {
+          setErrors(prev => ({ ...prev, images: result.error }));
+          hasError = true;
+          break;
+        }
+        if (result.compressedFile) {
+          processedImages.push(result.compressedFile);
+        }
+      }
+
+      if (hasError) {
+        setImages([]);
+        setCoverImageIndex(0);
+        if (fileInputRef.current) fileInputRef.current.value = '';
       } else {
         setErrors(prev => ({ ...prev, images: undefined }));
-        setImages(files);
+        setImages(processedImages);
         setCoverImageIndex(0);
       }
     }

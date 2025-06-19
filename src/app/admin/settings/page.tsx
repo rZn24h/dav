@@ -7,6 +7,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/utils/firebase';
 import AdminAuthGuard from '@/components/AdminAuthGuard';
 import AdminNavbar from '@/components/AdminNavbar';
+import { validateAndCompressImage } from '@/utils/imageUtils';
 
 interface ConfigData {
   nume: string;
@@ -75,13 +76,27 @@ export default function SettingsPage() {
     setForm(prev => ({ ...prev, [name]: value || '' }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'banner') => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'banner') => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (type === 'logo') {
-        setLogoFile(file);
-      } else {
-        setBannerFile(file);
+      
+      // Validează și comprimă imaginea
+      const result = await validateAndCompressImage(file);
+      
+      if (!result.isValid) {
+        setError(result.error || 'Eroare la procesarea imaginii');
+        // Resetează input-ul
+        e.target.value = '';
+        return;
+      }
+      
+      if (result.compressedFile) {
+        if (type === 'logo') {
+          setLogoFile(result.compressedFile);
+        } else {
+          setBannerFile(result.compressedFile);
+        }
+        setError(''); // Curăță erorile anterioare
       }
     }
   };
