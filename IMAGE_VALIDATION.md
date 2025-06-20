@@ -12,17 +12,21 @@ Sistemul de validare și compresie a imaginilor asigură că toate imaginile în
 - **Implementare**: Verificare `file.type.startsWith('image/')`
 
 ### 2. Dimensiunea Fișierului
-- **Restricție**: Maxim 2MB per fișier
-- **Implementare**: Verificare `file.size > 2 * 1024 * 1024`
+- **Restricție**: Maxim 8MB per fișier
+- **Implementare**: Verificare `file.size > 8 * 1024 * 1024`
 
 ### 3. Dimensiunile Imaginii
-- **Restricție**: Lățimea sau înălțimea nu poate depăși 2048 pixeli
+- **Restricție**: Lățimea sau înălțimea nu poate depăși 4000 pixeli
 - **Implementare**: Încărcare temporară ca URL și verificare dimensiuni
 
 ### 4. Compresia Automată
-- **Dimensiune maximă după compresie**: 1MB
-- **Rezoluție maximă**: 1920x1920 pixeli
+- **Dimensiune maximă după compresie**: 6MB
+- **Rezoluție maximă**: 4000x4000 pixeli
 - **Implementare**: Folosirea bibliotecii `browser-image-compression`
+
+### 5. Numărul de Imagini per Anunț
+- **Restricție**: Maxim 14 imagini per anunț
+- **Implementare**: Validare în pagina de adăugare mașini
 
 ## Funcții Utilitare
 
@@ -61,7 +65,7 @@ Validează tipul pentru multiple fișiere.
 - Validare automată la selectarea fișierelor
 - Compresie înainte de upload
 - Afișare erori în timp real
-- Suport pentru multiple imagini (max 8)
+- Suport pentru multiple imagini (max 14)
 
 ### Pagina de Setări (`/admin/settings`)
 - Validare pentru logo și banner
@@ -71,9 +75,10 @@ Validează tipul pentru multiple fișiere.
 ## Mesaje de Eroare
 
 1. **Tip fișier invalid**: "Doar fișierele de tip imagine sunt permise (JPG, PNG, GIF, etc.)"
-2. **Dimensiune prea mare**: "Fișierul este prea mare. Dimensiunea maximă permisă este 2MB."
-3. **Dimensiuni prea mari**: "Imaginea este prea mare. Dimensiunile maxime permise sunt 2048x2048 pixeli."
+2. **Dimensiune prea mare**: "Fișierul este prea mare. Dimensiunea maximă permisă este 8MB."
+3. **Dimensiuni prea mari**: "Imaginea este prea mare. Dimensiunile maxime permise sunt 4000x4000 pixeli."
 4. **Eroare procesare**: "A apărut o eroare la procesarea imaginii. Vă rugăm să încercați din nou."
+5. **Prea multe imagini**: "Poți selecta maxim 14 imagini"
 
 ## Dependințe
 
@@ -86,4 +91,5 @@ Validează tipul pentru multiple fișiere.
 2. **Spațiu**: Economie de spațiu în Firebase Storage
 3. **UX**: Feedback imediat pentru erori
 4. **SEO**: Imaginile optimizate sunt mai bune pentru SEO
-5. **Costuri**: Reducerea costurilor de storage și bandwidth 
+5. **Costuri**: Reducerea costurilor de storage și bandwidth
+6. **Flexibilitate**: Format pătrat permite mai multă flexibilitate în compoziția imaginilor 

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/utils/firebase';
 import AdminAuthGuard from '@/components/AdminAuthGuard';
 import AdminNavbar from '@/components/AdminNavbar';
 import { updateCar } from '@/utils/apiCars';
+import { validateAndCompressImage, validateImageFiles } from '@/utils/imageUtils';
 
 interface CarData {
   id: string;
@@ -36,6 +37,9 @@ export default function EditClient({ carId }: { carId: string }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [newImages, setNewImages] = useState<File[]>([]);
+  const [imageErrors, setImageErrors] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const fetchCar = async () => {
@@ -86,6 +90,75 @@ export default function EditClient({ carId }: { carId: string }) {
     setCar({ ...car, coverImage: imageUrl });
   };
 
+  const handleDeleteImage = (imageUrl: string) => {
+    if (!car) return;
+    
+    // Verifică dacă imaginea de șters este imaginea principală
+    if (car.coverImage === imageUrl) {
+      // Setează prima imagine rămasă ca principală
+      const remainingImages = car.images.filter(img => img !== imageUrl);
+      setCar({
+        ...car,
+        images: remainingImages,
+        coverImage: remainingImages[0] || ''
+      });
+    } else {
+      setCar({
+        ...car,
+        images: car.images.filter(img => img !== imageUrl)
+      });
+    }
+  };
+
+  const handleAddImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !car) return;
+    
+    const files = Array.from(e.target.files);
+    const totalImages = car.images.length + newImages.length + files.length;
+    
+    // Verifică limita de 14 imagini
+    if (totalImages > 14) {
+      setImageErrors('Poți avea maxim 14 imagini în total');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    // Verifică tipul fișierelor
+    const validationResult = validateImageFiles(files);
+    if (!validationResult.isValid) {
+      setImageErrors(validationResult.error || 'Eroare la validarea imaginilor');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    // Procesează fiecare imagine
+    const processedImages: File[] = [];
+    let hasError = false;
+
+    for (const file of files) {
+      const result = await validateAndCompressImage(file);
+      if (!result.isValid) {
+        setImageErrors(result.error || 'Eroare la procesarea imaginii');
+        hasError = true;
+        break;
+      }
+      if (result.compressedFile) {
+        processedImages.push(result.compressedFile);
+      }
+    }
+
+    if (hasError) {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    } else {
+      setImageErrors('');
+      setNewImages(prev => [...prev, ...processedImages]);
+    }
+  };
+
+  const handleRemoveNewImage = (index: number) => {
+    setNewImages(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!car) return;
@@ -102,7 +175,7 @@ export default function EditClient({ carId }: { carId: string }) {
         an: Number(car.an),
         capacitate: Number(car.capacitate),
         putere: car.putere ? Number(car.putere) : null
-      });
+      }, newImages.length > 0 ? newImages : undefined, car.coverImage);
 
       setSuccess('✅ Anunțul a fost actualizat cu succes!');
       setTimeout(() => router.push('/admin/list'), 2000);
@@ -172,8 +245,10 @@ export default function EditClient({ carId }: { carId: string }) {
                 <form onSubmit={handleSubmit}>
                   {/* Image gallery and cover image selection */}
                   <div className="mb-4">
-                    <label className="form-label">Imagini</label>
-                    <div className="d-flex flex-wrap gap-3">
+                    <label className="form-label">Imagini ({car.images.length + newImages.length}/14)</label>
+                    
+                    {/* Existing images */}
+                    <div className="d-flex flex-wrap gap-3 mb-3">
                       {car.images.map((imageUrl, idx) => (
                         <div key={idx} className="position-relative" style={{ width: 150 }}>
                           <img
@@ -181,20 +256,92 @@ export default function EditClient({ carId }: { carId: string }) {
                             alt={`Imagine ${idx + 1}`}
                             className="car-thumbnail mb-2"
                             style={{
+                              width: '100%',
+                              height: 100,
+                              objectFit: 'cover',
+                              borderRadius: 6,
                               border: imageUrl === car.coverImage ? '3px solid #0d6efd' : '1px solid #dee2e6',
                             }}
                           />
-                          <div className="d-grid">
+                          <div className="d-grid gap-1">
                             <button
                               type="button"
                               className={`btn btn-sm ${imageUrl === car.coverImage ? 'btn-primary' : 'btn-outline-primary'}`}
                               onClick={() => handleCoverImageChange(imageUrl)}
                             >
-                              {imageUrl === car.coverImage ? 'Imagine principală' : 'Setează ca principală'}
+                              {imageUrl === car.coverImage ? '✓ Principală' : 'Setează principală'}
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline-danger"
+                              onClick={() => handleDeleteImage(imageUrl)}
+                            >
+                              🗑️ Șterge
                             </button>
                           </div>
                         </div>
                       ))}
+                    </div>
+
+                    {/* New images preview */}
+                    {newImages.length > 0 && (
+                      <div className="mb-3">
+                        <h6 className="text-muted">Imagini noi de adăugat:</h6>
+                        <div className="d-flex flex-wrap gap-3">
+                          {newImages.map((file, idx) => (
+                            <div key={`new-${idx}`} className="position-relative" style={{ width: 150 }}>
+                              <img
+                                src={URL.createObjectURL(file)}
+                                alt={`Imagine nouă ${idx + 1}`}
+                                className="car-thumbnail mb-2"
+                                style={{
+                                  width: '100%',
+                                  height: 100,
+                                  objectFit: 'cover',
+                                  borderRadius: 6,
+                                  border: '2px dashed #28a745',
+                                }}
+                              />
+                              <div className="d-grid">
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-outline-danger"
+                                  onClick={() => handleRemoveNewImage(idx)}
+                                >
+                                  🗑️ Elimină
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Add images section */}
+                    <div className="mb-3">
+                      <input
+                        type="file"
+                        className="form-control"
+                        multiple
+                        accept="image/*"
+                        onChange={handleAddImages}
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-outline-primary"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={car.images.length + newImages.length >= 14}
+                      >
+                        📷 Adaugă imagini ({car.images.length + newImages.length}/14)
+                      </button>
+                      {imageErrors && (
+                        <div className="text-danger mt-2 small">{imageErrors}</div>
+                      )}
+                      <div className="form-text">
+                        Poți adăuga până la 14 imagini în total. Dimensiunea maximă: 8MB per imagine.
+                      </div>
                     </div>
                   </div>
 

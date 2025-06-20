@@ -135,8 +135,8 @@ export default function AddCarPage() {
     if (images.length === 0) {
       newErrors.images = 'Trebuie să selectezi cel puțin o imagine';
       isValid = false;
-    } else if (images.length > 8) {
-      newErrors.images = 'Poți selecta maxim 8 imagini';
+    } else if (images.length > 14) {
+      newErrors.images = 'Poți selecta maxim 14 imagini';
       isValid = false;
     }
 
@@ -158,8 +158,8 @@ export default function AddCarPage() {
       const files = Array.from(e.target.files);
       
       // Verifică numărul de fișiere
-      if (files.length > 8) {
-        setErrors(prev => ({ ...prev, images: 'Poți selecta maxim 8 imagini' }));
+      if (files.length > 14) {
+        setErrors(prev => ({ ...prev, images: 'Poți selecta maxim 14 imagini' }));
         setImages([]);
         setCoverImageIndex(0);
         if (fileInputRef.current) fileInputRef.current.value = '';
@@ -517,7 +517,7 @@ export default function AddCarPage() {
 
                     {/* Image upload section */}
                     <div className="col-12">
-                      <label className="form-label">Imagini (1-8 imagini) *</label>
+                      <label className="form-label">Imagini (1-14 imagini) *</label>
                       <input
                         type="file"
                         className={`form-control ${errors.images ? 'is-invalid' : ''}`}

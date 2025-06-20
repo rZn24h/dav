@@ -16,16 +16,16 @@ export async function validateAndCompressImage(file: File): Promise<ImageValidat
       };
     }
 
-    // 2. Verifică dimensiunea fișierului (max 2MB)
-    const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+    // 2. Verifică dimensiunea fișierului (max 8MB)
+    const maxSizeInBytes = 8 * 1024 * 1024; // 8MB
     if (file.size > maxSizeInBytes) {
       return {
         isValid: false,
-        error: 'Fișierul este prea mare. Dimensiunea maximă permisă este 2MB.'
+        error: 'Fișierul este prea mare. Dimensiunea maximă permisă este 8MB.'
       };
     }
 
-    // 3. Verifică dimensiunile imaginii
+    // 3. Verifică dimensiunile imaginii (max 4000x4000 pixeli)
     const imageUrl = URL.createObjectURL(file);
     const img = new Image();
     
@@ -35,7 +35,8 @@ export async function validateAndCompressImage(file: File): Promise<ImageValidat
       img.src = imageUrl;
     });
 
-    const maxDimension = 2048;
+    const maxDimension = 4000;
+    
     if (img.width > maxDimension || img.height > maxDimension) {
       URL.revokeObjectURL(imageUrl);
       return {
@@ -48,8 +49,8 @@ export async function validateAndCompressImage(file: File): Promise<ImageValidat
 
     // 4. Comprimă imaginea
     const options = {
-      maxSizeMB: 1, // Dimensiune maximă 1MB
-      maxWidthOrHeight: 1920, // Rezoluție maximă 1920x1920
+      maxSizeMB: 6, // Dimensiune maximă 6MB după compresie
+      maxWidthOrHeight: 4000, // Rezoluție maximă 4000x4000
       useWebWorker: true,
       fileType: file.type
     };

@@ -41,8 +41,10 @@ export async function updateCar(id: string, data: any, newImages?: File[], cover
   }
   const currentData = carDoc.data();
 
-  // 2. Upload new images if any
-  let imageUrls = [...(currentData.images || [])];
+  // 2. Handle existing images - keep only the ones that are still in data.images
+  let imageUrls = [...(data.images || [])];
+  
+  // 3. Upload new images if any
   if (newImages && newImages.length > 0) {
     for (const image of newImages) {
       const storageRef = ref(storage, `cars/${currentData.userId}/${Date.now()}_${image.name}`);
@@ -52,7 +54,19 @@ export async function updateCar(id: string, data: any, newImages?: File[], cover
     }
   }
 
-  // 3. Prepare update data
+  // 4. Delete removed images from Storage
+  const removedImages = (currentData.images || []).filter((url: string) => !imageUrls.includes(url));
+  for (const url of removedImages) {
+    try {
+      const path = decodeURIComponent(url.split('/o/')[1].split('?')[0]);
+      const imageRef = ref(storage, path);
+      await deleteObject(imageRef);
+    } catch (e) {
+      console.warn('Could not delete image:', e);
+    }
+  }
+
+  // 5. Prepare update data
   const updateData = {
     ...data,
     images: imageUrls,
@@ -60,7 +74,7 @@ export async function updateCar(id: string, data: any, newImages?: File[], cover
     updatedAt: Timestamp.now(),
   };
 
-  // 4. Update Firestore document
+  // 6. Update Firestore document
   await updateDoc(carRef, updateData);
   return id;
 }
