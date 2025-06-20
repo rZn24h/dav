@@ -17,6 +17,16 @@ interface ConfigData {
   locatie?: string;
   whatsapp?: string;
   facebook?: string;
+  email?: string;
+  program?: {
+    luniVineri?: string;
+    sambata?: string;
+    duminica?: string;
+  };
+  mapCoordinates?: {
+    latitude?: string;
+    longitude?: string;
+  };
   siteTitle?: string;
   siteDescription?: string;
 }
@@ -31,6 +41,9 @@ export default function SettingsPage() {
     locatie: '',
     whatsapp: '',
     facebook: '',
+    email: '',
+    program: {},
+    mapCoordinates: {},
     siteTitle: '',
     siteDescription: '',
   });
@@ -58,6 +71,9 @@ export default function SettingsPage() {
             locatie: data.locatie || '',
             whatsapp: data.whatsapp || '',
             facebook: data.facebook || '',
+            email: data.email || '',
+            program: data.program || {},
+            mapCoordinates: data.mapCoordinates || {},
             siteTitle: data.siteTitle || '',
             siteDescription: data.siteDescription || '',
           });
@@ -268,6 +284,144 @@ export default function SettingsPage() {
                 onChange={handleChange}
                 placeholder="Ex: https://www.facebook.com/numepagina"
               />
+            </div>
+            
+            <div className="col-md-4">
+              <label className="form-label">Email</label>
+              <input
+                type="email"
+                className="form-control"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="Ex: contact@autod.ro"
+              />
+            </div>
+
+            {/* Program Schedule */}
+            <div className="col-12">
+              <h4 className="h6 mb-3">Program de funcționare</h4>
+            </div>
+            
+            <div className="col-md-4">
+              <label className="form-label">Luni - Vineri</label>
+              <input
+                type="text"
+                className="form-control"
+                name="program.luniVineri"
+                value={form.program?.luniVineri || ''}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  const fieldName = name.split('.')[1];
+                  setForm(prev => ({
+                    ...prev,
+                    program: {
+                      ...prev.program,
+                      [fieldName]: value
+                    }
+                  }));
+                }}
+                placeholder="Ex: 09:00 - 18:00"
+              />
+            </div>
+            
+            <div className="col-md-4">
+              <label className="form-label">Sâmbătă</label>
+              <input
+                type="text"
+                className="form-control"
+                name="program.sambata"
+                value={form.program?.sambata || ''}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  const fieldName = name.split('.')[1];
+                  setForm(prev => ({
+                    ...prev,
+                    program: {
+                      ...prev.program,
+                      [fieldName]: value
+                    }
+                  }));
+                }}
+                placeholder="Ex: 10:00 - 14:00"
+              />
+            </div>
+            
+            <div className="col-md-4">
+              <label className="form-label">Duminică</label>
+              <input
+                type="text"
+                className="form-control"
+                name="program.duminica"
+                value={form.program?.duminica || ''}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  const fieldName = name.split('.')[1];
+                  setForm(prev => ({
+                    ...prev,
+                    program: {
+                      ...prev.program,
+                      [fieldName]: value
+                    }
+                  }));
+                }}
+                placeholder="Ex: Închis"
+              />
+            </div>
+
+            {/* Map Coordinates */}
+            <div className="col-12">
+              <h4 className="h6 mb-3">Coordonate hartă</h4>
+            </div>
+            
+            <div className="col-md-6">
+              <label className="form-label">Latitudine</label>
+              <input
+                type="text"
+                className="form-control"
+                name="mapCoordinates.latitude"
+                value={form.mapCoordinates?.latitude || ''}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  const fieldName = name.split('.')[1];
+                  setForm(prev => ({
+                    ...prev,
+                    mapCoordinates: {
+                      ...prev.mapCoordinates,
+                      [fieldName]: value
+                    }
+                  }));
+                }}
+                placeholder="Ex: 44.4268"
+              />
+              <div className="form-text">
+                Coordonata de latitudine pentru poziția pe hartă
+              </div>
+            </div>
+            
+            <div className="col-md-6">
+              <label className="form-label">Longitudine</label>
+              <input
+                type="text"
+                className="form-control"
+                name="mapCoordinates.longitude"
+                value={form.mapCoordinates?.longitude || ''}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  const fieldName = name.split('.')[1];
+                  setForm(prev => ({
+                    ...prev,
+                    mapCoordinates: {
+                      ...prev.mapCoordinates,
+                      [fieldName]: value
+                    }
+                  }));
+                }}
+                placeholder="Ex: 26.1024"
+              />
+              <div className="form-text">
+                Coordonata de longitudine pentru poziția pe hartă
+              </div>
             </div>
 
             {/* SEO Settings */}

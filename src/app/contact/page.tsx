@@ -22,6 +22,27 @@ export default function ContactPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleMapClick = () => {
+    // Folosește coordonatele din configurație sau coordonatele implicite
+    const latitude = config?.mapCoordinates?.latitude || '44.4268';
+    const longitude = config?.mapCoordinates?.longitude || '26.1024';
+    const address = config?.locatie || 'București, România';
+    
+    // Deschide Google Maps cu coordonatele exacte
+    const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}&z=15`;
+    window.open(mapsUrl, '_blank');
+  };
+
+  // Generează URL-ul pentru iframe-ul hărții
+  const getMapUrl = () => {
+    const latitude = config?.mapCoordinates?.latitude || '44.4268';
+    const longitude = config?.mapCoordinates?.longitude || '26.1024';
+    const address = config?.locatie || 'București, România';
+    
+    // URL mai simplu și mai precis pentru Google Maps embed
+    return `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(address)}&center=${latitude},${longitude}&zoom=15`;
+  };
+
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
@@ -52,17 +73,33 @@ export default function ContactPage() {
                   <div className="mb-4">
                     <h3 className="h6 mb-2">Email</h3>
                     <p className="mb-0">
-                      <a href="mailto:contact@autod.ro" className="text-decoration-none">
-                        contact@autod.ro
+                      <a href={`mailto:${config?.email || 'contact@autod.ro'}`} className="text-decoration-none">
+                        {config?.email || 'contact@autod.ro'}
                       </a>
                     </p>
                   </div>
 
                   <div className="mb-4">
                     <h3 className="h6 mb-2">Program</h3>
-                    <p className="mb-0">Luni - Vineri: 09:00 - 18:00</p>
-                    <p className="mb-0">Sâmbătă: 10:00 - 14:00</p>
-                    <p className="mb-0">Duminică: Închis</p>
+                    {config?.program ? (
+                      <>
+                        {config.program.luniVineri && (
+                          <p className="mb-0">Luni - Vineri: {config.program.luniVineri}</p>
+                        )}
+                        {config.program.sambata && (
+                          <p className="mb-0">Sâmbătă: {config.program.sambata}</p>
+                        )}
+                        {config.program.duminica && (
+                          <p className="mb-0">Duminică: {config.program.duminica}</p>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <p className="mb-0">Luni - Vineri: 09:00 - 18:00</p>
+                        <p className="mb-0">Sâmbătă: 10:00 - 14:00</p>
+                        <p className="mb-0">Duminică: Închis</p>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -122,16 +159,43 @@ export default function ContactPage() {
           {/* Google Maps Embed */}
           <div className="mt-5">
             <div className="card shadow-sm">
+              <div className="card-header bg-light">
+                <h3 className="h5 mb-0">Locația noastră</h3>
+                <small className="text-muted">Click pe hartă pentru a deschide în Google Maps</small>
+              </div>
               <div className="card-body p-0">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2848.899790399046!2d26.1024!3d44.4268!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDTCsDI1JzM2LjUiTiAyNsKwMDYnMDguNiJF!5e0!3m2!1sen!2sro!4v1635000000000!5m2!1sen!2sro"
-                  width="100%"
-                  height="450"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                ></iframe>
+                <div 
+                  className="position-relative cursor-pointer"
+                  onClick={handleMapClick}
+                  style={{ cursor: 'pointer' }}
+                  onMouseEnter={(e) => {
+                    const overlay = e.currentTarget.querySelector('.map-overlay') as HTMLElement;
+                    if (overlay) overlay.style.opacity = '0';
+                  }}
+                  onMouseLeave={(e) => {
+                    const overlay = e.currentTarget.querySelector('.map-overlay') as HTMLElement;
+                    if (overlay) overlay.style.opacity = '1';
+                  }}
+                >
+                  <iframe
+                    src={getMapUrl()}
+                    width="100%"
+                    height="450"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                  <div 
+                    className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center map-overlay"
+                    style={{ transition: 'opacity 0.3s ease' }}
+                  >
+                    <div className="bg-dark bg-opacity-75 text-white p-3 rounded shadow">
+                      <i className="bi bi-geo-alt-fill me-2"></i>
+                      Click pentru a deschide în Google Maps
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
