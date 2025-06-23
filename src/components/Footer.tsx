@@ -11,7 +11,7 @@ const Footer = () => {
       <div className="container">
         <div className="row">
           <div className="col-md-6 mb-3 mb-md-0">
-            <p className="mb-2">© 2025 {config?.nume || 'AutoHausDAVID'} – Toate drepturile rezervate</p>
+            <p className="mb-2">© {new Date().getFullYear()} {config?.siteName || 'AutoDav'} – Toate drepturile rezervate</p>
             <div className="footer-links mb-3">
               <Link href="/termeni" className="text-decoration-none me-3">
                 Termeni și condiții
@@ -49,7 +49,7 @@ const Footer = () => {
                   className="text-decoration-none"
                   style={{ color: 'inherit' }}
                 >
-                  {config?.nume || 'AutoHausDAVID'}
+                  {config?.siteName || 'AutoDav'}
                 </a>
               </p>
             )}

@@ -31,7 +31,7 @@ const Navbar: React.FC = () => {
           ) : config?.logoUrl ? (
             <img
               src={config.logoUrl}
-              alt={config.nume || 'Logo'}
+              alt={config.siteName || 'Logo'}
               style={{
                 width: 'auto',
                 height: '40px',

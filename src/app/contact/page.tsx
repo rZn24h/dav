@@ -73,8 +73,8 @@ export default function ContactPage() {
                   <div className="mb-4">
                     <h3 className="h6 mb-2">Email</h3>
                     <p className="mb-0">
-                      <a href={`mailto:${config?.email || 'contact@autod.ro'}`} className="text-decoration-none">
-                        {config?.email || 'contact@autod.ro'}
+                      <a href={`mailto:${config?.contactEmail || 'contact@autod.ro'}`} className="text-decoration-none">
+                        {config?.contactEmail || 'contact@autod.ro'}
                       </a>
                     </p>
                   </div>

@@ -143,27 +143,25 @@ export default function HomePage() {
         }}
       >
         {/* Optimized Banner Image with priority loading */}
-        {config?.bannerImg ? (
+        {loadingConfig ? (
+          <div className="d-flex justify-content-center align-items-center" style={{ height: '400px' }}>
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        ) : config?.bannerImageUrl && (
           <Image 
-            src={config.bannerImg} 
+            src={config.bannerImageUrl} 
             alt="Banner AutoD" 
             fill
             priority
             sizes="100vw"
             quality={85}
             placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mN8/wcAAgAB/epv2AAAAABJRU5ErkJggg=="
             className="position-absolute"
             style={{
               objectFit: 'cover',
-              zIndex: 0
-            }}
-          />
-        ) : (
-          <div 
-            className="position-absolute w-100 h-100"
-            style={{
-              backgroundColor: '#002f34',
               zIndex: 0
             }}
           />
@@ -186,7 +184,7 @@ export default function HomePage() {
             </div>
           ) : (
             <>
-              <h1 className="display-4 fw-bold mb-4">{config?.nume || 'Anunțuri Auto'}</h1>
+              <h1 className="display-4 fw-bold mb-4">{config?.siteName || 'Anunțuri Auto'}</h1>
               <p className="lead mb-0">{config?.slogan || 'Descoperă mașina perfectă pentru tine!'}</p>
             </>
           )}

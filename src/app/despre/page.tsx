@@ -16,7 +16,7 @@ export default function AboutPage() {
             <div className="text-center mb-5">
               <img 
                 src={config.logoUrl} 
-                alt={config?.nume || 'Logo'} 
+                alt={config?.siteName || 'Logo'} 
                 className="img-fluid"
                 style={{
                   maxWidth: '300px',

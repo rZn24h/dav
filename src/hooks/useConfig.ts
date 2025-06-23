@@ -5,15 +5,25 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/utils/firebase';
 
 interface Config {
-  nume: string;
-  slogan: string;
-  bannerImg: string;
-  logoUrl: string;
-  siteTitle: string;
-  siteDescription: string;
+  siteName: string;
+  contactEmail: string;
+  phoneNumber: string;
+  address: string;
+  bannerImageUrl: string;
+  logoUrl?: string;
+  slogan?: string;
+  locatie?: string;
+  mapCoordinates?: {
+    latitude: string;
+    longitude: string;
+  };
+  program?: {
+    luniVineri?: string;
+    sambata?: string;
+    duminica?: string;
+  };
   whatsapp?: string;
-  contactEmail?: string;
-  adresa?: string;
+  facebook?: string;
 }
 
 export function useConfig() {

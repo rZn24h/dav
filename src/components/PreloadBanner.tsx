@@ -7,31 +7,29 @@ export default function PreloadBanner() {
   const { config } = useConfig();
 
   useEffect(() => {
-    if (config?.bannerImg) {
+    if (config?.bannerImageUrl) {
       // Preload banner image
       const link = document.createElement('link');
       link.rel = 'preload';
       link.as = 'image';
-      link.href = config.bannerImg;
+      link.href = config.bannerImageUrl;
       link.fetchPriority = 'high';
       document.head.appendChild(link);
 
       // Also preload as fetch for better caching
-      fetch(config.bannerImg, { 
+      fetch(config.bannerImageUrl, { 
         method: 'HEAD',
         mode: 'cors'
-      }).catch(() => {
-        // Silently fail if preload fails
+      }).catch(err => {
+        // We can ignore errors here, as this is just an optimization
+        console.warn('Failed to preload banner image:', err);
       });
 
       return () => {
-        // Cleanup
-        if (link.parentNode) {
-          link.parentNode.removeChild(link);
-        }
+        document.head.removeChild(link);
       };
     }
-  }, [config?.bannerImg]);
+  }, [config?.bannerImageUrl]);
 
   return null;
 } 
