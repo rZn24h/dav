@@ -66,29 +66,31 @@ export default function CarCard({ car }: CarCardProps) {
           </div>
         </div>
         
-        {/* Middle part: Specs */}
-        <div className="specs-grid">
-          <div className="spec-item" title={`${formattedKm} km`}>
-            <FaRoad className="spec-icon" />
-            <span className="spec-text">{formattedKm} km</span>
-          </div>
-          <div className="spec-item" title={car.combustibil}>
-            <FaGasPump className="spec-icon" />
-            <span className="spec-text">{car.combustibil}</span>
-          </div>
-          <div className="spec-item" title={`${car.capacitate} cm³`}>
-            <FaCar className="spec-icon" />
-            <span className="spec-text">{car.capacitate} cm³</span>
-          </div>
-          {car.putere && (
-            <div className="spec-item" title={`${car.putere} CP`}>
-              <FaTachometerAlt className="spec-icon" />
-              <span className="spec-text">{car.putere} CP</span>
+        {/* Middle part: Specs in their own container */}
+        <div className="specs-grid-container">
+          <div className="specs-grid">
+            <div className="spec-item" title={`${formattedKm} km`}>
+              <FaRoad className="spec-icon" />
+              <span className="spec-text">{formattedKm} km</span>
             </div>
-          )}
-          <div className="spec-item" title={car.transmisie}>
-            <FaCog className="spec-icon" />
-            <span className="spec-text">{car.transmisie}</span>
+            <div className="spec-item" title={car.combustibil}>
+              <FaGasPump className="spec-icon" />
+              <span className="spec-text">{car.combustibil}</span>
+            </div>
+            <div className="spec-item" title={`${car.capacitate} cm³`}>
+              <FaCar className="spec-icon" />
+              <span className="spec-text">{car.capacitate} cm³</span>
+            </div>
+            {car.putere && (
+              <div className="spec-item" title={`${car.putere} CP`}>
+                <FaTachometerAlt className="spec-icon" />
+                <span className="spec-text">{car.putere} CP</span>
+              </div>
+            )}
+            <div className="spec-item" title={car.transmisie}>
+              <FaCog className="spec-icon" />
+              <span className="spec-text">{car.transmisie}</span>
+            </div>
           </div>
         </div>
 

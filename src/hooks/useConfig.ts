@@ -1,36 +1,42 @@
+'use client';
+
 import { useState, useEffect } from 'react';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/utils/firebase';
-import { useAuth } from '@/contexts/AuthContext';
+
+interface Config {
+  nume: string;
+  slogan: string;
+  bannerImg: string;
+  logoUrl: string;
+  siteTitle: string;
+  siteDescription: string;
+  whatsapp?: string;
+  contactEmail?: string;
+  adresa?: string;
+}
 
 export function useConfig() {
-  const [config, setConfig] = useState<any>(null);
+  const [config, setConfig] = useState<Config | null>(null);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
 
   useEffect(() => {
-    // Use a fixed document ID for public config
-    const configRef = doc(db, 'config', 'public');
-    
-    // Subscribe to real-time updates
-    const unsubscribe = onSnapshot(configRef, 
-      (doc) => {
-        if (doc.exists()) {
-          setConfig(doc.data());
-        } else {
-          setConfig(null);
+    const fetchConfig = async () => {
+      try {
+        const docRef = doc(db, 'config', 'public');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setConfig(docSnap.data() as Config);
         }
-        setLoading(false);
-      },
-      (error) => {
-        console.error('Error fetching config:', error);
+      } catch (error) {
+        console.error("Error fetching config:", error);
+      } finally {
         setLoading(false);
       }
-    );
+    };
 
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, []); // Remove user dependency since we're using a fixed document
+    fetchConfig();
+  }, []);
 
   return { config, loading };
 } 

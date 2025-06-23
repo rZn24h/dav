@@ -260,7 +260,7 @@ export default function HomePage() {
 
             {/* Reset Button */}
             <div className="col-12 col-md-6 col-lg-3">
-              <div className="search-bar-item d-flex align-items-end">
+              <div className="search-bar-item d-flex align-items-end h-100">
                 <button
                   type="button"
                   className="btn btn-outline-secondary w-100"
@@ -271,25 +271,27 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Sort Controls */}
-        <div className="sort-controls mt-3">
-          <div className="d-flex gap-2 flex-wrap">
-            <button
-              type="button"
-              className={`btn btn-sm ${sortBy === 'price-asc' ? 'btn-primary' : 'btn-outline-primary'}`}
-              onClick={() => handleSort('price-asc')}
-            >
-              Preț crescător
-            </button>
-            <button
-              type="button"
-              className={`btn btn-sm ${sortBy === 'price-desc' ? 'btn-primary' : 'btn-outline-primary'}`}
-              onClick={() => handleSort('price-desc')}
-            >
-              Preț descrescător
-            </button>
+          
+          {/* Sort Controls - Moved inside */}
+          <div className="border-top my-3"></div>
+          <div className="sort-controls">
+            <label className="form-label">Sortare:</label>
+            <div className="d-flex gap-2 flex-wrap">
+              <button
+                type="button"
+                className={`btn btn-sm ${sortBy === 'price-asc' ? 'btn-primary' : 'btn-outline-primary'}`}
+                onClick={() => handleSort('price-asc')}
+              >
+                Preț crescător
+              </button>
+              <button
+                type="button"
+                className={`btn btn-sm ${sortBy === 'price-desc' ? 'btn-primary' : 'btn-outline-primary'}`}
+                onClick={() => handleSort('price-desc')}
+              >
+                Preț descrescător
+              </button>
+            </div>
           </div>
         </div>
       </div>

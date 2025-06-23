@@ -6,19 +6,25 @@ import Link from 'next/link';
 import { useConfig } from '@/hooks/useConfig';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdmin } from '@/hooks/useAdmin';
+import { auth } from '@/utils/firebase';
+import HydrationSuppressor from './HydrationSuppressor';
 
 const Navbar: React.FC = () => {
   const pathname = usePathname();
-  const { config, loading } = useConfig();
-  const { user } = useAuth();
+  const { config, loading: configLoading } = useConfig();
+  const { user, loading: authLoading } = useAuth();
   const { isAdmin, loading: adminLoading } = useAdmin();
+
+  const handleLogout = async () => {
+    await auth.signOut();
+  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
       <div className="container">
         {/* Logo */}
         <Link href="/" className="navbar-brand d-flex align-items-center">
-          {loading ? (
+          {configLoading ? (
             <div className="spinner-border spinner-border-sm" role="status">
               <span className="visually-hidden">Se încarcă...</span>
             </div>
@@ -86,6 +92,27 @@ const Navbar: React.FC = () => {
               </li>
             )}
           </ul>
+        </div>
+
+        <div className="d-flex align-items-center ms-auto">
+          <HydrationSuppressor fallback={<div style={{ width: '75px' }} />}>
+            {authLoading ? (
+              <div style={{ width: '75px' }} /> /* Placeholder to prevent layout shift */
+            ) : user ? (
+              <div className="d-flex align-items-center gap-2">
+                <Link href="/admin/dashboard" className="btn btn-sm btn-outline-secondary">
+                  Admin
+                </Link>
+                <button onClick={handleLogout} className="btn btn-sm btn-primary">
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link href="/login" className="btn btn-sm btn-primary">
+                Login
+              </Link>
+            )}
+          </HydrationSuppressor>
         </div>
       </div>
     </nav>

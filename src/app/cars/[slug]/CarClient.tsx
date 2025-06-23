@@ -141,53 +141,84 @@ export default function CarClient({ car }: { car: CarDetails }) {
             )}
 
             {/* Car Details Sections */}
-            <div className="car-details-section mt-4">
+            <div className="car-details-section">
               <h2 className="car-details-section-title">
                 <FaCar /> Detalii tehnice
               </h2>
               <div className="car-details-specs">
+                {/* Kilometraj */}
                 <div className="car-spec-item">
-                  <FaRoad className="car-spec-icon" />
-                  <span className="car-spec-label">Kilometraj</span>
-                  <span className="car-spec-value">{formattedKm} km</span>
+                  <div className="car-spec-icon"><FaRoad /></div>
+                  <div className="car-spec-text-content">
+                    <span className="car-spec-label">Kilometraj</span>
+                    <span className="car-spec-value">{formattedKm} km</span>
+                  </div>
                 </div>
+
+                {/* An fabricație */}
                 <div className="car-spec-item">
-                  <FaGasPump className="car-spec-icon" />
-                  <span className="car-spec-label">Combustibil</span>
-                  <span className="car-spec-value">{car.combustibil}</span>
+                  <div className="car-spec-icon"><FaCalendarAlt /></div>
+                  <div className="car-spec-text-content">
+                    <span className="car-spec-label">An fabricație</span>
+                    <span className="car-spec-value">{car.an}</span>
+                  </div>
                 </div>
+
+                {/* Combustibil */}
                 <div className="car-spec-item">
-                  <FaCog className="car-spec-icon" />
-                  <span className="car-spec-label">Transmisie</span>
-                  <span className="car-spec-value">{car.transmisie}</span>
+                  <div className="car-spec-icon"><FaGasPump /></div>
+                  <div className="car-spec-text-content">
+                    <span className="car-spec-label">Combustibil</span>
+                    <span className="car-spec-value">{car.combustibil}</span>
+                  </div>
                 </div>
+
+                {/* Transmisie */}
                 <div className="car-spec-item">
-                  <FaCalendarAlt className="car-spec-icon" />
-                  <span className="car-spec-label">An fabricație</span>
-                  <span className="car-spec-value">{car.an}</span>
+                  <div className="car-spec-icon"><FaCog /></div>
+                  <div className="car-spec-text-content">
+                    <span className="car-spec-label">Transmisie</span>
+                    <span className="car-spec-value">{car.transmisie}</span>
+                  </div>
                 </div>
+                
+                {/* Putere */}
                 {car.putere && (
                   <div className="car-spec-item">
-                    <FaTachometerAlt className="car-spec-icon" />
-                    <span className="car-spec-label">Putere</span>
-                    <span className="car-spec-value">{car.putere} CP</span>
+                    <div className="car-spec-icon"><FaTachometerAlt /></div>
+                    <div className="car-spec-text-content">
+                      <span className="car-spec-label">Putere</span>
+                      <span className="car-spec-value">{car.putere} CP</span>
+                    </div>
                   </div>
                 )}
+
+                {/* Capacitate cilindrica */}
                 <div className="car-spec-item">
-                  <FaCar className="car-spec-icon" />
-                  <span className="car-spec-label">Capacitate</span>
-                  <span className="car-spec-value">{car.capacitate} cm³</span>
+                  <div className="car-spec-icon"><FaCar /></div>
+                  <div className="car-spec-text-content">
+                    <span className="car-spec-label">Capacitate</span>
+                    <span className="car-spec-value">{car.capacitate} cm³</span>
+                  </div>
                 </div>
+
+                {/* Caroserie */}
                 <div className="car-spec-item">
-                  <FaCar className="car-spec-icon" />
-                  <span className="car-spec-label">Caroserie</span>
-                  <span className="car-spec-value">{car.caroserie}</span>
+                  <div className="car-spec-icon"><FaCar /></div>
+                  <div className="car-spec-text-content">
+                    <span className="car-spec-label">Caroserie</span>
+                    <span className="car-spec-value">{car.caroserie}</span>
+                  </div>
                 </div>
+
+                {/* Tractiune */}
                 {car.tractiune && (
                   <div className="car-spec-item">
-                    <FaCogs className="car-spec-icon" />
-                    <span className="car-spec-label">Tracțiune</span>
-                    <span className="car-spec-value">{car.tractiune}</span>
+                    <div className="car-spec-icon"><FaCogs /></div>
+                    <div className="car-spec-text-content">
+                      <span className="car-spec-label">Tracțiune</span>
+                      <span className="car-spec-value">{car.tractiune}</span>
+                    </div>
                   </div>
                 )}
               </div>
