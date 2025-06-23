@@ -24,7 +24,7 @@ const nextConfig = {
   
   // Experimental features for performance
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // Disabled: Caused 'critters' module not found error on Vercel build
     optimizePackageImports: ['bootstrap', 'react-icons', 'bootstrap-icons'],
     turbo: {
       rules: {
