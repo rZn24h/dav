@@ -4,10 +4,18 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import PreloadBanner from '@/components/PreloadBanner';
 import Script from 'next/script';
 import { getConfig } from "@/utils/apiCars";
+import AsyncCss from "@/components/AsyncCss";
 
-const inter = Inter({ subsets: ["latin"] });
+// Optimize font loading
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'arial'],
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = await getConfig();
@@ -15,6 +23,17 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: config?.siteTitle || "AutoD",
     description: config?.siteDescription || "AutoD - Your Car Service Platform",
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://autodav.ro'),
+    openGraph: {
+      title: config?.siteTitle || "AutoD",
+      description: config?.siteDescription || "AutoD - Your Car Service Platform",
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: config?.siteTitle || "AutoD",
+      description: config?.siteDescription || "AutoD - Your Car Service Platform",
+    },
   };
 }
 
@@ -24,19 +43,23 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="ro">
       <head>
-        <link 
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
-          rel="stylesheet"
-        />
-        <link 
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" 
-          rel="stylesheet"
-        />
+        <AsyncCss />
+
+        {/* DNS prefetch for external domains */}
+        <link rel="dns-prefetch" href="//cdn.jsdelivr.net" />
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+        
+        {/* Preconnect to critical domains */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className={inter.className}>
         <AuthProvider>
+          <PreloadBanner />
           <div className="background-wrapper min-vh-100 d-flex flex-column">
             <Navbar />
             <main className="main-content flex-grow-1">
@@ -45,9 +68,12 @@ export default function RootLayout({
             <Footer />
           </div>
         </AuthProvider>
+        
+        {/* Load Bootstrap JS asynchronously */}
         <Script
           src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
+          defer
         />
       </body>
     </html>

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { FaRoad, FaGasPump, FaCog, FaTachometerAlt, FaCar, FaCalendarAlt } from 'react-icons/fa';
 
 interface CarCardProps {
@@ -32,13 +33,23 @@ export default function CarCard({ car }: CarCardProps) {
       href={`/cars/${car.id}`} 
       className="hover-card"
     >
-      {/* Car Image */}
+      {/* Optimized Car Image */}
       <div className="car-image-wrapper">
-        <img
+        <Image
           src={displayImage}
           alt={`${car.marca} ${car.model}`}
+          width={400}
+          height={300}
           className="car-image"
-          loading="lazy"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          quality={75}
+          placeholder="blur"
+          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+          style={{
+            objectFit: 'cover',
+            width: '100%',
+            height: '100%'
+          }}
         />
       </div>
 

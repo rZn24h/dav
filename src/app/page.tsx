@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '@/utils/firebase';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useConfig } from '@/hooks/useConfig';
 import CarCard from '@/components/CarCard';
 
@@ -132,7 +133,7 @@ export default function HomePage() {
 
   return (
     <div className="page-wrapper">
-      {/* Hero Section with Banner */}
+      {/* Hero Section with Banner - Optimized for LCP */}
       <section 
         className="hero-section position-relative d-flex align-items-center justify-content-center text-white"
         style={{
@@ -141,16 +142,20 @@ export default function HomePage() {
           marginTop: '-56px'
         }}
       >
-        {/* Banner Image */}
+        {/* Optimized Banner Image with priority loading */}
         {config?.bannerImg ? (
-          <img 
+          <Image 
             src={config.bannerImg} 
-            alt="Banner" 
-            className="position-absolute w-100 h-100"
+            alt="Banner AutoD" 
+            fill
+            priority
+            sizes="100vw"
+            quality={85}
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+            className="position-absolute"
             style={{
               objectFit: 'cover',
-              top: 0,
-              left: 0,
               zIndex: 0
             }}
           />
@@ -159,8 +164,6 @@ export default function HomePage() {
             className="position-absolute w-100 h-100"
             style={{
               backgroundColor: '#002f34',
-              top: 0,
-              left: 0,
               zIndex: 0
             }}
           />
@@ -171,8 +174,6 @@ export default function HomePage() {
           className="position-absolute w-100 h-100" 
           style={{ 
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            top: 0,
-            left: 0,
             zIndex: 1
           }}
         />
@@ -198,128 +199,125 @@ export default function HomePage() {
           <div className="row g-3">
             {/* Brand Search */}
             <div className="col-12 col-md-6 col-lg-3">
-              <div className="position-relative search-bar-item">
-                <label className="form-label">Marcă</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Caută marcă..."
-                  value={searchMarca}
-                  onChange={handleBrandInputChange}
-                  onFocus={() => {
-                    setShowSuggestions(true);
-                    if (!searchMarca.trim()) {
-                      setFilteredMarci(allMarci);
-                    }
-                  }}
-                />
-                {showSuggestions && (
-                  <div className="brand-suggestions">
-                    <ul>
-                      {filteredMarci.map((marca, index) => (
-                        <li
-                          key={index}
-                          onClick={() => handleBrandSelect(marca)}
-                          className="suggestion-item"
-                        >
-                          {marca}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+              <div className="search-bar-item">
+                <label className="form-label">Marca</label>
+                <div className="position-relative">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Caută după marcă..."
+                    value={searchMarca}
+                    onChange={handleBrandInputChange}
+                    onFocus={() => setShowSuggestions(true)}
+                  />
+                  {showSuggestions && filteredMarci.length > 0 && (
+                    <div className="brand-suggestions">
+                      <ul className="list-unstyled mb-0">
+                        {filteredMarci.slice(0, 10).map((marcaOption, index) => (
+                          <li key={index}>
+                            <button
+                              type="button"
+                              className="suggestion-item"
+                              onClick={() => handleBrandSelect(marcaOption)}
+                            >
+                              {marcaOption}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Price Range */}
-            <div className="col-12 col-sm-6 col-lg-3">
+            <div className="col-12 col-md-6 col-lg-3">
               <div className="search-bar-item">
                 <label className="form-label">Preț minim</label>
                 <input
                   type="number"
                   className="form-control"
-                  placeholder="Preț minim"
+                  placeholder="Preț minim..."
                   value={pretMin}
                   onChange={(e) => setPretMin(e.target.value)}
                 />
               </div>
             </div>
 
-            <div className="col-12 col-sm-6 col-lg-3">
+            <div className="col-12 col-md-6 col-lg-3">
               <div className="search-bar-item">
                 <label className="form-label">Preț maxim</label>
                 <input
                   type="number"
                   className="form-control"
-                  placeholder="Preț maxim"
+                  placeholder="Preț maxim..."
                   value={pretMax}
                   onChange={(e) => setPretMax(e.target.value)}
                 />
               </div>
             </div>
 
-            {/* Sort Controls */}
-            <div className="col-12 col-lg-3">
-              <div className="search-bar-item">
-                <label className="form-label">Sortare după preț</label>
-                <div className="d-flex gap-2">
-                  <button
-                    className={`btn flex-grow-1 ${
-                      sortBy === 'price-asc' ? 'btn-primary' : 'btn-outline-primary'
-                    }`}
-                    onClick={() => handleSort('price-asc')}
-                  >
-                    Crescător
-                  </button>
-                  <button
-                    className={`btn flex-grow-1 ${
-                      sortBy === 'price-desc' ? 'btn-primary' : 'btn-outline-primary'
-                    }`}
-                    onClick={() => handleSort('price-desc')}
-                  >
-                    Descrescător
-                  </button>
-                </div>
-              </div>
-            </div>
-
             {/* Reset Button */}
-            {(marca || pretMin || pretMax || sortBy) && (
-              <div className="col-12">
+            <div className="col-12 col-md-6 col-lg-3">
+              <div className="search-bar-item d-flex align-items-end">
                 <button
+                  type="button"
                   className="btn btn-outline-secondary w-100"
                   onClick={handleReset}
                 >
-                  Resetează filtrele
+                  Resetează
                 </button>
               </div>
-            )}
+            </div>
           </div>
         </div>
 
-        {/* Listings Section */}
+        {/* Sort Controls */}
+        <div className="sort-controls mt-3">
+          <div className="d-flex gap-2 flex-wrap">
+            <button
+              type="button"
+              className={`btn btn-sm ${sortBy === 'price-asc' ? 'btn-primary' : 'btn-outline-primary'}`}
+              onClick={() => handleSort('price-asc')}
+            >
+              Preț crescător
+            </button>
+            <button
+              type="button"
+              className={`btn btn-sm ${sortBy === 'price-desc' ? 'btn-primary' : 'btn-outline-primary'}`}
+              onClick={() => handleSort('price-desc')}
+            >
+              Preț descrescător
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Cars Listings */}
+      <div className="container mt-5">
         <div className="listings-container">
-          <div className="listings-header">
-            <h2>
-              {filtered.length} {filtered.length === 1 ? 'anunț' : 'anunțuri'} disponibile
+          <div className="listings-header mb-4">
+            <h2 className="h3 mb-0">
+              {loading ? 'Se încarcă...' : `${filtered.length} mașini găsite`}
             </h2>
           </div>
 
           {loading ? (
             <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Se încarcă anunțurile...</span>
+              <div className="spinner-border" role="status">
+                <span className="visually-hidden">Se încarcă...</span>
               </div>
             </div>
-          ) : filtered.length > 0 ? (
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-5">
+              <p className="text-muted">Nu s-au găsit mașini cu criteriile selectate.</p>
+            </div>
+          ) : (
             <div className="listings-grid">
               {filtered.map((car) => (
                 <CarCard key={car.id} car={car} />
               ))}
-            </div>
-          ) : (
-            <div className="text-center py-5">
-              <h3 className="text-muted">Nu am găsit anunțuri care să corespundă criteriilor tale.</h3>
             </div>
           )}
         </div>

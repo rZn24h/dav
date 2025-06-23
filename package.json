@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "analyze": "ANALYZE=true npm run build",
+    "build:analyze": "cross-env ANALYZE=true next build",
+    "export": "next build && next export",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
@@ -23,10 +27,13 @@
     "react-select": "^5.10.1"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^14.1.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20.19.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
+    "cross-env": "^7.0.3",
+    "image-webpack-loader": "^8.1.0",
     "tailwindcss": "^4",
     "typescript": "^5.8.3"
   }
