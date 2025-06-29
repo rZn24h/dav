@@ -170,7 +170,7 @@ export default function HomePage() {
         <div 
           className="position-absolute w-100 h-100" 
           style={{ 
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backgroundColor: 'rgba(0, 0, 0, 0.1)',
             top: 0,
             left: 0,
             zIndex: 1
