@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useConfig } from '@/hooks/useConfig';
@@ -12,6 +12,18 @@ const Navbar: React.FC = () => {
   const { config, loading } = useConfig();
   const { user } = useAuth();
   const { isAdmin, loading: adminLoading } = useAdmin();
+
+  // Close mobile menu when pathname changes
+  useEffect(() => {
+    const navbarCollapse = document.getElementById('navbarNav');
+    if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+      // Use Bootstrap's collapse API to close the menu
+      const bsCollapse = new (window as any).bootstrap.Collapse(navbarCollapse, {
+        toggle: false
+      });
+      bsCollapse.hide();
+    }
+  }, [pathname]);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">

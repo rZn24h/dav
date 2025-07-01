@@ -13,6 +13,7 @@ const AdminNavbar = () => {
     { label: 'Dashboard', path: '/admin/dashboard' },
     { label: 'Adaugă anunț', path: '/admin/add' },
     { label: 'Administrare anunțuri', path: '/admin/list' },
+    { label: 'Migrare mărci', path: '/admin/migration' },
     { label: 'Setări parc auto', path: '/admin/settings' },
   ];
 

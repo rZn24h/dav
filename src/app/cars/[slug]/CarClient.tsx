@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from 'react';
-import { FaChevronLeft, FaChevronRight, FaRoad, FaGasPump, FaCog, FaCar, FaTachometerAlt, FaWhatsapp, FaPhone, FaMapMarkerAlt, FaUser, FaCalendarAlt, FaCogs } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { FaChevronLeft, FaChevronRight, FaRoad, FaGasPump, FaCog, FaCar, FaTachometerAlt, FaWhatsapp, FaPhone, FaMapMarkerAlt, FaUser, FaCalendarAlt, FaCogs, FaTimes, FaExpand } from 'react-icons/fa';
 import { useConfig } from '@/hooks/useConfig';
 import { useRouter } from 'next/navigation';
 
@@ -33,10 +33,61 @@ export default function CarClient({ car }: { car: CarDetails }) {
   const router = useRouter();
   const images: string[] = car.images || [];
   const [currentImage, setCurrentImage] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const goToImage = (idx: number) => setCurrentImage(idx);
-  const prevImage = () => setCurrentImage(prev => (prev === 0 ? images.length - 1 : prev - 1));
-  const nextImage = () => setCurrentImage(prev => (prev === images.length - 1 ? 0 : prev + 1));
+  const goToImage = (idx: number) => {
+    setCurrentImage(idx);
+  };
+  
+  const prevImage = () => {
+    setCurrentImage(prev => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+  
+  const nextImage = () => {
+    setCurrentImage(prev => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  const openModal = (idx: number) => {
+    setCurrentImage(idx);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  // Keyboard navigation for modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isModalOpen) return;
+      
+      if (e.key === 'Escape') {
+        closeModal();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevImage();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextImage();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isModalOpen]);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isModalOpen]);
 
   const formattedPrice = new Intl.NumberFormat('ro-RO').format(car.pret);
   const formattedKm = new Intl.NumberFormat('ro-RO').format(car.km);
@@ -57,18 +108,59 @@ export default function CarClient({ car }: { car: CarDetails }) {
         {/* Left column - Gallery and Details */}
         <div className="col-12 col-lg-8">
           {/* Image Gallery */}
-          <div className="gallery-container" style={{ height: '500px' }}>
+          <div className="gallery-container" style={{ height: '500px', position: 'relative' }}>
             {images.length > 0 ? (
               <>
-                <img
-                  src={images[currentImage]}
-                  alt={`${car.marca} ${car.model} - Imagine ${currentImage + 1}`}
+                <div 
+                  className="gallery-image-wrapper"
                   style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'contain'
+                    overflow: 'hidden',
+                    position: 'relative',
+                    cursor: 'pointer'
                   }}
-                />
+                >
+                  <img
+                    src={images[currentImage]}
+                    alt={`${car.marca} ${car.model} - Imagine ${currentImage + 1}`}
+                    onClick={() => openModal(currentImage)}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      transition: 'transform 0.3s ease'
+                    }}
+                  />
+                  
+                  {/* Expand button overlay */}
+                  <div 
+                    className="expand-overlay"
+                    onClick={() => openModal(currentImage)}
+                    style={{
+                      position: 'absolute',
+                      top: '1rem',
+                      right: '1rem',
+                      background: 'rgba(0, 0, 0, 0.7)',
+                      color: 'white',
+                      padding: '0.5rem',
+                      borderRadius: '50%',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      zIndex: 10
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(0, 0, 0, 0.9)';
+                      e.currentTarget.style.transform = 'scale(1.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(0, 0, 0, 0.7)';
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }}
+                  >
+                    <FaExpand size={16} />
+                  </div>
+                </div>
                 
                 {/* Navigation arrows */}
                 {images.length > 1 && (
@@ -77,6 +169,7 @@ export default function CarClient({ car }: { car: CarDetails }) {
                       onClick={prevImage}
                       className="gallery-nav-button prev"
                       aria-label="Imaginea anterioară"
+                      style={{ zIndex: 15 }}
                     >
                       <FaChevronLeft />
                     </button>
@@ -84,11 +177,27 @@ export default function CarClient({ car }: { car: CarDetails }) {
                       onClick={nextImage}
                       className="gallery-nav-button next"
                       aria-label="Imaginea următoare"
+                      style={{ zIndex: 15 }}
                     >
                       <FaChevronRight />
                     </button>
                   </>
                 )}
+                
+                {/* Image counter */}
+                <div className="image-counter" style={{
+                  position: 'absolute',
+                  bottom: '1rem',
+                  right: '1rem',
+                  background: 'rgba(0, 0, 0, 0.7)',
+                  color: 'white',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '20px',
+                  fontSize: '0.875rem',
+                  zIndex: 20
+                }}>
+                  {currentImage + 1} / {images.length}
+                </div>
               </>
             ) : (
               <div className="d-flex align-items-center justify-content-center h-100">
@@ -261,6 +370,142 @@ export default function CarClient({ car }: { car: CarDetails }) {
           </div>
         </div>
       </div>
+      {/* Modal for fullscreen image */}
+      {isModalOpen && (
+        <div
+          className="car-image-modal"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0,0,0,0.95)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            transition: 'background 0.3s',
+          }}
+          onClick={closeModal}
+        >
+          <button
+            className="car-image-modal-close"
+            onClick={closeModal}
+            style={{
+              position: 'absolute',
+              top: 32,
+              right: 32,
+              background: 'rgba(0,0,0,0.95)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '50%',
+              width: 48,
+              height: 48,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 28,
+              zIndex: 2100,
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              transition: 'background 0.2s, transform 0.2s',
+            }}
+            aria-label="Închide imaginea mare"
+            tabIndex={0}
+          >
+            <FaTimes />
+          </button>
+          {/* Navigation arrows */}
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={e => { e.stopPropagation(); prevImage(); }}
+                style={{
+                  position: 'absolute',
+                  left: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'rgba(0,0,0,0.7)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: 40,
+                  height: 40,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 22,
+                  zIndex: 2100,
+                  cursor: 'pointer',
+                }}
+                aria-label="Imaginea anterioară"
+              >
+                <FaChevronLeft />
+              </button>
+              <button
+                onClick={e => { e.stopPropagation(); nextImage(); }}
+                style={{
+                  position: 'absolute',
+                  right: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'rgba(0,0,0,0.7)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: 40,
+                  height: 40,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 22,
+                  zIndex: 2100,
+                  cursor: 'pointer',
+                }}
+                aria-label="Imaginea următoare"
+              >
+                <FaChevronRight />
+              </button>
+            </>
+          )}
+          {/* Fullscreen image */}
+          <img
+            src={images[currentImage]}
+            alt={`Imagine mare ${currentImage + 1}`}
+            style={{
+              maxWidth: '96vw',
+              maxHeight: '70vh',
+              objectFit: 'contain',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.7)',
+              borderRadius: 12,
+              background: '#222',
+              zIndex: 2050,
+              userSelect: 'none',
+              marginTop: 32,
+              marginBottom: 16,
+              transition: 'all 0.2s',
+            }}
+            onClick={e => e.stopPropagation()}
+          />
+          {/* Image counter */}
+          <div style={{
+            position: 'absolute',
+            bottom: 24,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: 'rgba(0,0,0,0.7)',
+            color: 'white',
+            padding: '0.5rem 1.5rem',
+            borderRadius: 20,
+            fontSize: '1rem',
+            zIndex: 2100,
+          }}>
+            {currentImage + 1} / {images.length}
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

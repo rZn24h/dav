@@ -8,6 +8,7 @@ import AdminAuthGuard from '@/components/AdminAuthGuard';
 import AdminNavbar from '@/components/AdminNavbar';
 import { updateCar } from '@/utils/apiCars';
 import { validateAndCompressImage, validateImageFiles } from '@/utils/imageUtils';
+import { getBrands, addBrand, Brand } from '@/utils/brands';
 
 interface CarData {
   id: string;
@@ -40,14 +41,31 @@ export default function EditClient({ carId }: { carId: string }) {
   const [newImages, setNewImages] = useState<File[]>([]);
   const [imageErrors, setImageErrors] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Brand management state
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [brandsLoading, setBrandsLoading] = useState(true);
+  const [selectedBrand, setSelectedBrand] = useState('');
+  const [newBrand, setNewBrand] = useState('');
+  const [brandSelectionType, setBrandSelectionType] = useState<'existing' | 'new' | null>(null);
 
   useEffect(() => {
-    const fetchCar = async () => {
+    const fetchData = async () => {
       try {
-        const carDoc = await getDoc(doc(db, 'cars', carId));
+        // Load car data and brands in parallel
+        const [carDoc, brandsData] = await Promise.all([
+          getDoc(doc(db, 'cars', carId)),
+          getBrands()
+        ]);
+        
+        // Set brands
+        setBrands(brandsData);
+        setBrandsLoading(false);
+        
+        // Set car data
         if (carDoc.exists()) {
           const data = carDoc.data();
-          setCar({
+          const carData = {
             id: carDoc.id,
             title: data.title || '',
             marca: data.marca || '',
@@ -66,23 +84,85 @@ export default function EditClient({ carId }: { carId: string }) {
             locatie: data.locatie,
             images: data.images || [],
             coverImage: data.coverImage || data.images?.[0],
-          });
+          };
+          
+          setCar(carData);
+          
+          // Set brand selection based on existing marca
+          if (carData.marca) {
+            const existingBrand = brandsData.find(b => b.name === carData.marca);
+            if (existingBrand) {
+              setBrandSelectionType('existing');
+              setSelectedBrand(carData.marca);
+            } else {
+              setBrandSelectionType('new');
+              setNewBrand(carData.marca);
+            }
+          }
         } else {
           setError('Anunțul nu a fost găsit');
         }
       } catch (err) {
-        setError('Eroare la încărcarea anunțului');
+        setError('Eroare la încărcarea datelor');
       } finally {
         setLoading(false);
       }
     };
-    fetchCar();
+    fetchData();
   }, [carId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (!car) return;
     setCar({ ...car, [name]: value });
+  };
+
+  const handleBrandSelectionChange = (type: 'existing' | 'new') => {
+    setBrandSelectionType(type);
+    setSelectedBrand('');
+    setNewBrand('');
+    if (car) {
+      setCar({ ...car, marca: '' });
+    }
+  };
+
+  const handleExistingBrandChange = (brandName: string) => {
+    setSelectedBrand(brandName);
+    if (car) {
+      setCar({ ...car, marca: brandName });
+    }
+  };
+
+  const handleNewBrandChange = (brandName: string) => {
+    setNewBrand(brandName);
+    if (car) {
+      setCar({ ...car, marca: brandName });
+    }
+  };
+
+  const handleAddNewBrand = async () => {
+    if (!newBrand.trim()) {
+      return;
+    }
+
+    try {
+      await addBrand(newBrand.trim());
+      // Refresh brands list
+      const updatedBrands = await getBrands();
+      setBrands(updatedBrands);
+      setSuccess('✅ Marcă nouă adăugată cu succes!');
+      
+      // Auto-dismiss success message after 3 seconds
+      setTimeout(() => {
+        setSuccess('');
+      }, 3000);
+    } catch (brandError) {
+      if (brandError instanceof Error && brandError.message === 'Această marcă există deja') {
+        setError('Această marcă există deja în listă');
+      } else {
+        setError(brandError instanceof Error ? brandError.message : 'Nu s-a putut adăuga marca');
+      }
+    }
   };
 
   const handleCoverImageChange = (imageUrl: string) => {
@@ -359,20 +439,106 @@ export default function EditClient({ carId }: { carId: string }) {
                       />
                     </div>
 
-                    <div className="col-md-3">
-                      <label className="form-label">Marcă</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="marca"
-                        value={car.marca}
-                        onChange={handleChange}
-                        required
-                      />
+                    <div className="col-md-6">
+                      <label className="form-label">Marcă *</label>
+                      
+                      {/* Brand selection type radio buttons */}
+                      <div className="mb-3">
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="brandSelectionType"
+                            id="existingBrand"
+                            checked={brandSelectionType === 'existing'}
+                            onChange={() => handleBrandSelectionChange('existing')}
+                          />
+                          <label className="form-check-label fw-bold" htmlFor="existingBrand">
+                            📋 Alege marcă existentă
+                          </label>
+                        </div>
+                        <div className="form-check form-check-inline">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="brandSelectionType"
+                            id="newBrand"
+                            checked={brandSelectionType === 'new'}
+                            onChange={() => handleBrandSelectionChange('new')}
+                          />
+                          <label className="form-check-label fw-bold" htmlFor="newBrand">
+                            ➕ Adaugă marcă nouă
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Existing brand dropdown */}
+                      {brandSelectionType === 'existing' && (
+                        <div className="mb-3">
+                          <select
+                            className="form-select"
+                            value={selectedBrand}
+                            onChange={(e) => handleExistingBrandChange(e.target.value)}
+                            disabled={brandsLoading}
+                            required
+                          >
+                            <option value="">Alege o marcă...</option>
+                            {brands.map((brand) => (
+                              <option key={brand.id} value={brand.name}>
+                                {brand.name}
+                              </option>
+                            ))}
+                          </select>
+                          {brandsLoading && <div className="form-text">Se încarcă mărcile...</div>}
+                          {!brandsLoading && (
+                            <div className="d-flex justify-content-between align-items-center">
+                              <div className="form-text">
+                                {brands.length > 0 
+                                  ? `${brands.length} marcă${brands.length === 1 ? '' : 'i'} disponibilă${brands.length === 1 ? '' : 'e'}`
+                                  : 'Nu există mărci în listă. Adaugă o marcă nouă!'
+                                }
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* New brand input */}
+                      {brandSelectionType === 'new' && (
+                        <div className="mb-3">
+                          <div className="input-group">
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={newBrand}
+                              onChange={(e) => handleNewBrandChange(e.target.value)}
+                              placeholder="Introduceți numele mărcii noi..."
+                              onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  handleAddNewBrand();
+                                }
+                              }}
+                              required
+                            />
+                            <button
+                              type="button"
+                              className="btn btn-success"
+                              onClick={handleAddNewBrand}
+                              disabled={!newBrand.trim()}
+                            >
+                              ➕ Adaugă
+                            </button>
+                          </div>
+                          <div className="form-text">
+                            Apăsați Enter sau butonul pentru a adăuga marca în listă
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    <div className="col-md-3">
-                      <label className="form-label">Model</label>
+                    <div className="col-md-6">
+                      <label className="form-label">Model *</label>
                       <input
                         type="text"
                         className="form-control"

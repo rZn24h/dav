@@ -6,6 +6,7 @@ import { db } from '@/utils/firebase';
 import Link from 'next/link';
 import { useConfig } from '@/hooks/useConfig';
 import CarCard from '@/components/CarCard';
+import { getBrands, Brand } from '@/utils/brands';
 
 type SortOption = 'price-asc' | 'price-desc';
 
@@ -27,12 +28,14 @@ export default function HomePage() {
   const [pretMax, setPretMax] = useState('');
   const [sortBy, setSortBy] = useState<SortOption | null>(null);
   const [loading, setLoading] = useState(true);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [brandsLoading, setBrandsLoading] = useState(true);
   const { config, loading: loadingConfig } = useConfig();
 
-  // Extract unique brands from cars
+  // Get brand names from the brands collection
   const allMarci = useMemo(() => {
-    return Array.from(new Set(cars.map(car => car.marca).filter(Boolean))).sort();
-  }, [cars]);
+    return brands.map(brand => brand.name).sort();
+  }, [brands]);
 
   // Filter brands based on search input
   useEffect(() => {
@@ -81,16 +84,30 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    const fetchCars = async () => {
+    const fetchData = async () => {
       setLoading(true);
-      const q = query(collection(db, 'cars'), orderBy('createdAt', 'desc'));
-      const snap = await getDocs(q);
-      const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setCars(data);
-      setFiltered(data);
-      setLoading(false);
+      setBrandsLoading(true);
+      
+      try {
+        // Load cars and brands in parallel
+        const [carsSnapshot, brandsData] = await Promise.all([
+          getDocs(query(collection(db, 'cars'), orderBy('createdAt', 'desc'))),
+          getBrands()
+        ]);
+        
+        const carsData = carsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setCars(carsData);
+        setFiltered(carsData);
+        setBrands(brandsData);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
+        setBrandsLoading(false);
+      }
     };
-    fetchCars();
+    
+    fetchData();
   }, []);
 
   const handleSort = (option: SortOption) => {
@@ -203,28 +220,44 @@ export default function HomePage() {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Caută marcă..."
+                  placeholder={brandsLoading ? "Se încarcă mărcile..." : "Caută marcă..."}
                   value={searchMarca}
                   onChange={handleBrandInputChange}
                   onFocus={() => {
-                    setShowSuggestions(true);
-                    if (!searchMarca.trim()) {
-                      setFilteredMarci(allMarci);
+                    if (!brandsLoading) {
+                      setShowSuggestions(true);
+                      if (!searchMarca.trim()) {
+                        setFilteredMarci(allMarci);
+                      }
                     }
                   }}
+                  disabled={brandsLoading}
                 />
-                {showSuggestions && (
+                {brandsLoading && (
+                  <div className="position-absolute top-50 end-0 translate-middle-y pe-3">
+                    <div className="spinner-border spinner-border-sm text-muted" role="status">
+                      <span className="visually-hidden">Se încarcă...</span>
+                    </div>
+                  </div>
+                )}
+                {showSuggestions && !brandsLoading && (
                   <div className="brand-suggestions">
                     <ul>
-                      {filteredMarci.map((marca, index) => (
-                        <li
-                          key={index}
-                          onClick={() => handleBrandSelect(marca)}
-                          className="suggestion-item"
-                        >
-                          {marca}
+                      {filteredMarci.length > 0 ? (
+                        filteredMarci.map((marca, index) => (
+                          <li
+                            key={index}
+                            onClick={() => handleBrandSelect(marca)}
+                            className="suggestion-item"
+                          >
+                            {marca}
+                          </li>
+                        ))
+                      ) : (
+                        <li className="suggestion-item text-muted">
+                          Nu s-au găsit mărci
                         </li>
-                      ))}
+                      )}
                     </ul>
                   </div>
                 )}
